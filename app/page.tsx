@@ -1,101 +1,108 @@
-import Image from "next/image";
+"use client";
+import { useState, useEffect } from 'react';
+import { carsData } from "@/constants/carsData";  // Import the static car data
+import { CarCard, SearchBar, CustomFilter, Hero } from "@/components";
+import { useSearchParams } from 'next/navigation'; // Import useSearchParams
+import { fuels, yearsOfProduction } from "@/constants";
+import ShowMore from "@/components/ShowMore";
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const search = useSearchParams(); // Use the hook to get searchParams dynamically
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  // Retrieve parameters safely after unwrapping them
+  const manufacturer = search.get('manufacturer') || '';
+  const year = search.get('year') || '';
+  const fuel = search.get('fuel') || '';
+  const model = search.get('model') || '';
+  
+  // Pagination State
+  const [visibleCars, setVisibleCars] = useState(12); // Initially show 12 cars
+  const [filteredCars, setFilteredCars] = useState(carsData);
+  const [isDataEmpty, setIsDataEmpty] = useState<boolean>(false);
+
+  useEffect(() => {
+    const filterCars = () => {
+      let filtered = carsData;
+
+      if (manufacturer) {
+        filtered = filtered.filter((car) =>
+          car.make.toLowerCase().includes(manufacturer.toLowerCase())
+        );
+      }
+
+      if (year) {
+        filtered = filtered.filter((car) => car.year.toString() === year);
+      }
+
+      if (fuel) {
+        filtered = filtered.filter((car) => car.fuel.toLowerCase() === fuel.toLowerCase());
+      }
+
+      if (model) {
+        filtered = filtered.filter((car) =>
+          car.model.toLowerCase().includes(model.toLowerCase())
+        );
+      }
+
+      // Update the filtered cars state
+      setFilteredCars(filtered);
+      setIsDataEmpty(filtered.length === 0);
+    };
+
+    filterCars();
+  }, [manufacturer, year, fuel, model]); // Dependencies for useEffect
+
+  // Load more cars when "Show More" is clicked
+  const handleShowMore = () => {
+    setVisibleCars((prevVisibleCars) => prevVisibleCars + 12); // Show 12 more cars
+  };
+
+  // Slice the filtered cars based on the current "visibleCars" state
+  const carsToDisplay = filteredCars.slice(0, visibleCars);
+
+  return (
+    <main className='overflow-hidden'>
+      <Hero />
+
+      <div className='mt-12 padding-x padding-y max-width' id='discover'>
+        <div className='home__text-container'>
+          <h1 className='text-4xl font-extrabold'>Car Catalogue</h1>
+          <p>Explore our cars you might like</p>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+
+        <div className='home__filters'>
+          <SearchBar />
+          <div className='home__filter-container z-10'>
+            <CustomFilter title="fuel" options={fuels} carsData={carsData} />
+            <CustomFilter title="Year" options={yearsOfProduction} carsData={carsData} />
+          </div>
+        </div>
+
+        {!isDataEmpty ? (
+          <section>
+            <div className='home__cars-wrapper'>
+              {carsToDisplay.map((car) => (
+                <CarCard key={car.model + car.year} car={car} />
+              ))}
+            </div>
+
+            {/* "Show More" Button */}
+            {visibleCars < filteredCars.length && (
+              <div className="flex w-[150px] h-[50px] items-center justify-center lg:ml-[600px] bg-primary-blue text-white rounded-full mt-10 
+    sm:ml-0 sm:w-[120px] sm:h-[40px] sm:mt-5 sm:px-4">
+                <button onClick={handleShowMore} className="show-more-btn">
+                  Show More
+                </button>
+              </div>
+            )}
+          </section>
+        ) : (
+          <div className='home__error-container'>
+            <h2 className='text-black text-xl font-bold'>Oops, no results</h2>
+            <p>No cars match your criteria.</p>
+          </div>
+        )}
+      </div>
+    </main>
   );
 }
