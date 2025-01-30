@@ -17,26 +17,26 @@ const CustomFilter = ({ title, options, carsData }: CustomFilterProps) => {
   };
 
   const handleFilterChange = (value: string | number | undefined) => {
-    if (value === undefined) return; // Early return if value is undefined
+    if (value === undefined) return; 
   
-    // If carsData is undefined or empty, return early.
+
     if (!carsData || carsData.length === 0) return;
   
     let filteredCars = carsData;
   
-    // If the value is an empty string, return all cars
+  
     if (value === "") {
-      filteredCars = carsData; // Show all cars when no specific filter is selected
+      filteredCars = carsData; 
     } else if (title === "Year" && typeof value === "string") {
-      // Ensure both the value and car.year are strings for comparison
-      const selectedYear = String(value);  // Convert value to string
-      filteredCars = carsData.filter(car => String(car.year) === selectedYear);  // Convert car.year to string for comparison
+
+      const selectedYear = String(value); 
+      filteredCars = carsData.filter(car => String(car.year) === selectedYear);  
     } else if (title === "Fuel" && typeof value === "string") {
       filteredCars = carsData.filter(car => car.fuel.toLowerCase() === String(value).toLowerCase());
     }
   
-    // Update your state or UI with filtered cars here
-    console.log(filteredCars); // You can use this to display filtered cars, for example.
+
+    console.log(filteredCars);
   };
 
   return (
@@ -44,9 +44,9 @@ const CustomFilter = ({ title, options, carsData }: CustomFilterProps) => {
       <Listbox
         value={selected}
         onChange={(e) => {
-          setSelected(e); // Update the selected option in state
-          handleUpdateParams(e); // Update the URL search parameters and navigate to the new URL
-          handleFilterChange(e.value); // Filter cars based on the selected value
+          setSelected(e); 
+          handleUpdateParams(e); 
+          handleFilterChange(e.value); 
         }}
       >
         <div className='relative w-fit z-10'>
